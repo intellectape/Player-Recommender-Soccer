@@ -1,0 +1,125 @@
+#install.packages("RSQLite")
+library(RSQLite)
+library(DBI)
+con = dbConnect(RSQLite::SQLite(), dbname="ALDA/Project/Updated Data Set/soccer/database.sqlite")
+alltables = dbListTables(con)
+
+player_pos=dbGetQuery(con,'select * from Player_xy')
+class1=matrix(nrow = length(player_pos$id), dimnames = list(NULL, c("cl")))
+
+for(i in 1:nrow(class1)){
+  if(player_pos$y[i]==1)
+    class1[i]="GK"
+  else if(player_pos$y[i]>1 && player_pos$y[i]<5)
+    class1[i]="Def"
+  else if(player_pos$y[i]>=5 && player_pos$y[i]<=6)
+    class1[i]="Def_Mid"
+  else if(player_pos$y[i]==7){
+    if(player_pos$x[i]>=4 && player_pos$x[i]<=6)
+      class1[i]="Def_Mid"
+    else if(player_pos$x[i]<4 || player_pos$x[i]>7 )
+      class1[i]="Att_Mid"
+    else
+      class1[i]="Mid"
+  }
+  else if(player_pos$y[i]>=8 && player_pos$y[i]<=9)
+    class1[i]="Att_Mid"
+  else if(player_pos$y[i]>=10){
+    if(player_pos$x[i]<4 || player_pos$x[i]>=7)
+      class1[i]="Att_Mid"
+    else
+      class1[i]="Att"
+  }
+}
+
+id=matrix(data= player_pos$id, dimnames = list(NULL, c("pid")))
+xpos=matrix(data= player_pos$x, dimnames = list(NULL, c("x")))
+ypos=matrix(data= player_pos$y, dimnames = list(NULL, c("y")))
+
+p_pos=cbind(id,xpos,ypos,class1)
+
+library(rpart)
+#install.packages("stringi",type="win.binary")
+#install.packages("reshape2")
+library(reshape2)
+Ppos=melt(as.data.frame(p_pos), id=c("pid","x","y","cl"))
+#Ppos1=Ppos[sample(nrow(Ppos),130),]
+#install.packages("party")
+library(party)
+output.tree=ctree(formula = cl ~ x+y, data=Ppos)
+png(file="ALDA/Project/tree1.png",width=2800,height=1400, res=90)
+plot(output.tree, type="simple", uniform=TRUE, main="Classification Tree for Player Positions")
+dev.off()
+
+player_team=dbGetQuery(con,'select * from PlayerTeamMod')
+player_att=dbGetQuery(con,'select * from Player_Attributes')
+player_team=merge(x=player_team,y=Ppos,by.x="player_api_id", by.y = "pid", all = FALSE)
+
+head(player_team)
+temp=player_team[player_team$team_name=="Chelsea" & player_team$season=="2015/2016",]
+tempD=temp[temp$cl=="Def" | temp$cl=="Def_Mid",]
+tempM=temp[temp$cl=="Mid" | temp$cl=="Att_Mid",]
+tempA=temp[temp$cl=="Att",]
+tempG=temp[temp$cl=="GK",]
+
+#For defense
+avgDef1=matrix(nrow = length(tempD$player_api_id), dimnames = list(NULL, c("SkillAvg")))
+avgDef2=matrix(nrow = length(tempD$player_api_id), dimnames = list(NULL, c("OverallRating")))
+j=1
+for(i in tempD$player_api_id){
+  query1=paste("select marking, standing_tackle, sliding_tackle, short_passing,", 
+              "long_passing, jumping, stamina, strength,", 
+              "aggression, interceptions, positioning",
+              "from Player_Attributes where player_api_id='",i,"' and ",
+              "date between ('2015-07-01') and ('2016-06-30') order by date desc LIMIT 1")
+  query2=paste("select max(overall_rating) from Player_Attributes where player_api_id='",i,
+               "' and date between ('2015-07-01') and ('2016-06-30') order by date desc LIMIT 1")
+  avgDef1[j]=mean(as.integer(dbGetQuery(con,query1)))
+  avgDef2[j]=as.integer(dbGetQuery(con,query2))
+  tempo=as.integer(dbGetQuery(con,query1))
+  j=j+1
+}
+mean(avgDef1[1:8])
+mean(avgDef2[1:8])
+
+
+#For attack
+avgAtt1=matrix(nrow = length(tempA$player_api_id), dimnames = list(NULL, c("SkillAvg")))
+avgAtt2=matrix(nrow = length(tempA$player_api_id), dimnames = list(NULL, c("OverallRating")))
+tempo=matrix(nrow = length(tempA$player_api_id), ncol = 13, dimnames = list(NULL, c("finishing", "dribbling", "volleys", "heading_accuracy", "strength", "acceleration", "sprint_speed", "ball_control", "short_passing", "penalties", "shot_power", "reactions", "agility")))
+j=1
+for(i in tempA$player_api_id){
+  query1=paste("select finishing, dribbling, volleys, heading_accuracy, strength, acceleration,", 
+               "sprint_speed, positioning, ball_control, short_passing,", 
+               "shot_power, reactions, agility",
+               "from Player_Attributes where player_api_id='",i,"' and ",
+               "date between ('2015-07-01') and ('2016-06-30') order by date desc LIMIT 1")
+  query2=paste("select max(overall_rating) from Player_Attributes where player_api_id='",i,
+               "' and date between ('2015-07-01') and ('2016-06-30') order by date desc LIMIT 1")
+  avgAtt1[j]=mean(as.integer(dbGetQuery(con,query1)))
+  avgAtt2[j]=as.integer(dbGetQuery(con,query2))
+  tempo[j,]=as.integer(dbGetQuery(con,query1))
+  j=j+1
+}
+mean(avgAtt1)
+mean(avgAtt2)
+
+#For Midfield
+avgMid1=matrix(nrow = length(tempM$player_api_id), dimnames = list(NULL, c("SkillAvg")))
+avgMid2=matrix(nrow = length(tempM$player_api_id), dimnames = list(NULL, c("OverallRating")))
+tempo=matrix(nrow = length(tempM$player_api_id), ncol = 8, dimnames = list(NULL, c("vision", "ball_control", "short_passing", "long_passing", "long_shots", "penalties", "dribbling", "crossing")))
+j=1
+for(i in tempM$player_api_id){
+  query1=paste("select vision, ball_control, short_passing, long_passing, long_shots,", 
+               "penalties, dribbling, crossing", 
+               "from Player_Attributes where player_api_id='",i,"' and ",
+               "date between ('2015-07-01') and ('2016-06-30') order by date desc LIMIT 1")
+  query2=paste("select max(overall_rating) from Player_Attributes where player_api_id='",i,
+               "' and date between ('2015-07-01') and ('2016-06-30') order by date desc LIMIT 1")
+  avgMid1[j]=mean(as.integer(dbGetQuery(con,query1)))
+  avgMid2[j]=as.integer(dbGetQuery(con,query2))
+  tempo[j,]=as.integer(dbGetQuery(con,query1))
+  j=j+1
+}
+mean(avgMid1[1:5] + avgDef1[1:8] + avgAtt1)
+mean(avgMid2[1:5])

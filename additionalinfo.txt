@@ -1,0 +1,73 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf600
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;}
+{\*\expandedcolortbl;\csgray\c100000;\csgray\c0;\csgray\c100000;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 For overall rating information:\
+All the centroids are taken and then we will take the mean of these centroids for better recognition.\
+\
+For 80+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\fs22 \cf2 \cb3 \CocoaLigature0 [[ 5.47543471 -5.21506809]\
+ [-4.90283275 -4.4392618 ]\
+ [ 3.26518061  5.51316262]\
+ [-8.03454198  2.77805215]]\
+\
+For 70+\
+\
+[[ 2.54664292  4.11377822]\
+ [-3.65017015 -3.24659078]\
+ [-6.83147859  1.79460621]\
+ [ 4.63582019 -4.14751261]]\
+\
+\
+For 75+\
+\
+[[-4.32774428 -3.83026413]\
+ [ 5.18027483 -4.72090497]\
+ [ 2.76495143  4.78942214]\
+ [-7.43030218  2.4344763 ]]\
+\
+For 60+\
+\
+\
+\
+For 65+\
+\
+[[-6.1556393   1.36881562]\
+ [ 2.18298673  3.84509336]\
+ [ 4.14283624 -3.70427605]\
+ [-3.07236131 -2.87918237]]\
+\
+\
+For attacker:\
+\
+finishing >= 60\
+[[-1.46155233  5.95277173]\
+ [ 4.08953454  2.82937947]\
+ [-6.02348771  3.85297771]]\
+\
+\
+For Mid-Fielder: \
+\
+ball_control >= 60\
+[[-2.35108967  2.02067315]\
+ [ 1.48061538 -1.84012064]\
+ [ 0.6410053   3.7037213 ]]\
+\
+Three component t-sne based \
+[[-0.49692159  2.83029963 -1.44616187]\
+ [ 1.3373817  -1.79083824  3.28076094]\
+ [-1.47606836  2.75842514  2.64533761]]\
+\
+\
+Query for getting players latest skill per season:\
+\
+Select * from Player_Attributes where player_api_id = 22313 and date between ('2014-07-01') and ('2015-06-30') order by date desc LIMIT 1;\
+\
+\
+}

@@ -1,0 +1,72 @@
+# Generic
+
+overall_rating
+potential
+agility
+free_kick_accuracy
+preferred_foot
+reactions
+
+# Attack
+
+finishing (high)
+dribbling (high)
+volleys
+heading_accuracy
+curve (medium)
+acceleration
+sprint_speed
+attacking_work_rate
+free_kick_accuracy (medium)
+ball_control
+short_passing
+penalties
+shot_power
+balance (high)
+jumping
+
+"finishing, dribbling, volleys, heading_accuracy, strength, acceleration, sprint_speed, positioning, ball_control, short_passing,shot_power, reactions, agility"
+
+# Mid fielder
+
+vision
+ball_control
+short_passing
+long_passing
+ball_control
+long_shots
+marking (low)
+penalties
+aggression
+crossing (medium)
+sliding_tackle (low)
+standing_tackle (low)
+
+"vision, ball_control, short_passing, long_passing, long_shots, penalties, dribbling, crossing"
+
+# Defence
+
+short_passing
+long_passing
+defensive_work_rate
+crossing (low)
+jumping
+stamina
+strength
+long_shots
+aggression
+interceptions
+positioning
+marking (high)
+standing_tackle (high)
+sliding_tackle (high)
+
+"marking, standing_tackle, sliding_tackle, short_passing,long_passing, jumping, stamina, strength, aggression, interceptions, positioning"
+
+# Goal Keeper
+
+gk_diving
+gk_handling
+gk_kicking
+gk_positioning
+gk_reflexes
